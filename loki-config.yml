@@ -29,20 +29,19 @@ common:
 
 storage_config:
   aws:
-    s3: s3://herpyderpy:herpyderpy@minio:9001  # s3://herpyderpy:herpyderpy@minio:9001/loki-data
+    s3: s3://herpyderpy:herpyderpy@minio:9001  # /loki-data
     s3forcepathstyle: true
     bucketnames: loki-data,
   tsdb_shipper:
     active_index_directory: /loki/index
     cache_location: /loki/index_cache
-    cache_ttl: 48h  # Default is 24h.
 
 
 schema_config:
   configs:
   - from: 2020-07-01
     store: tsdb
-    object_store: aws # s3 ?
+    object_store: aws # OR s3 ?
     schema: v13
     index:
       prefix: index_
