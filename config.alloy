@@ -1,0 +1,20 @@
+local.file_match "applogs" {
+    path_targets = [{"__path__" = "/logs/*.log"}]
+    sync_period = "5s"  // Check for new files every 5 seconds.
+}
+
+loki.source.file "log_scrape" {
+    targets = local.file_match.applogs.targets
+    forward_to = [loki.write.grafana_loki.receiver]
+    tail_from_end = true  // Tail the log files from the end so you don’t ingest the entire log file history.
+}
+
+loki.write "grafana_loki" {
+    endpoint {
+        url = "http://loki:3100/loki/api/v1/push"
+    }
+}
+
+logging {
+    level = "debug"
+}
