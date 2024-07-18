@@ -17,21 +17,21 @@ common:
     instance_addr: 0.0.0.0
     kvstore:
       store: inmemory
-  # storage:
-  #   s3:
-  #     endpoint: minio:9000
-  #     insecure: true
-  #     bucketnames: loki-data
-  #     access_key_id: herpyderpy
-  #     secret_access_key: herpyderpy
-  #     s3forcepathstyle: true
+  storage:
+    s3:
+      endpoint: minio:9000
+      insecure: true
+      bucketnames: chunks
+      access_key_id: herpyderpy
+      secret_access_key: herpyderpy
+      s3forcepathstyle: true
 
 
 storage_config:
   aws:
-    s3: s3://herpyderpy:herpyderpy@minio:9001  # /loki-data
+    s3: s3://herpyderpy:herpyderpy@minio:9001
     s3forcepathstyle: true
-    bucketnames: loki-data,
+    bucketnames: chunks
   tsdb_shipper:
     active_index_directory: /loki/index
     cache_location: /loki/index_cache
@@ -41,7 +41,7 @@ schema_config:
   configs:
   - from: 2020-07-01
     store: tsdb
-    object_store: aws # OR s3 ?
+    object_store: s3
     schema: v13
     index:
       prefix: index_

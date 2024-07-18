@@ -60,7 +60,7 @@ services:
       - sh
       - -euc
       - |
-        mkdir -p /data/loki-data && \
+        mkdir -p /data/chunks && \
         minio server /data --address ":9000" --console-address ":9001"
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
@@ -71,7 +71,7 @@ services:
   grafana:
     image: grafana/grafana:10.4.5
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning
+      - ./grafana/provisioning:/etc/grafana/provisioning  # OR /var/lib/grafana/provisioning ?
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
