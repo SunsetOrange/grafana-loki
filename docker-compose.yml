@@ -35,6 +35,7 @@ services:
       - loki
     depends_on:
       - minio
+      - createbuckets
     ports:
       - 3100:3100
     command: -config.file=/etc/loki/config.yaml
@@ -50,28 +51,34 @@ services:
       - ~/minio/data:/data
     networks:
       - loki
-    environment:
-      - MINIO_ROOT_USER=herpyderpy
-      - MINIO_ROOT_PASSWORD=herpyderpy
     ports:
       - 9000:9000
       - 9001:9001
-    entrypoint:
-      - sh
-      - -euc
-      - |
-        mkdir -p /data/chunks && \
-        minio server /data --address ":9000" --console-address ":9001"
+    command: server ~ --address ":9000" --console-address ":9001"
     healthcheck:
       test: ["CMD", "mc", "ready", "local"]
       interval: 15s
       timeout: 10s
       retries: 5
 
+  createbuckets:
+    image: minio/mc
+    networks:
+      - loki
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until (/usr/bin/mc config host add myminio http://minio:9000 minioadmin minioadmin) do echo '...waiting...' && sleep 1; done;
+      /usr/bin/mc mb myminio/loki;
+      /usr/bin/mc anonymous set public myminio/loki;
+      exit 0;
+      "
+
   grafana:
     image: grafana/grafana:10.4.5
     volumes:
-      - ./grafana/provisioning:/etc/grafana/provisioning  # OR /var/lib/grafana/provisioning ?
+      - ./grafana/provisioning:/var/lib/grafana/provisioning
     environment:
       - GF_AUTH_ANONYMOUS_ENABLED=true
       - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
